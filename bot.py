@@ -34,7 +34,10 @@ def procesar(id_chat):
         
 def deleteMsgrs(id_chat):
     for msgr in Enumerable(msgr_to_delete).where(lambda p: p['id_chat'] == id_chat):
-        bot.delete_message(id_chat, msgr['id_message'])
+        try:
+            bot.delete_message(id_chat, msgr['id_message'])
+        except Exception as e:
+            print(e)
 
 def insertMsgr(msgr):
     msgr_to_delete.append({'id_chat': msgr.chat.id, 'id_message': msgr.id })
@@ -155,15 +158,15 @@ def dropShadow(image, offset=(5,5), background=0xffffff, shadow=0x444444, border
 
 @bot.message_handler(commands=["empezar", "start", "confirmar", "ayuda", "help", "reset"])
 def sendMessage(message):
-
+    print(message.text)
     if message.text in ["/empezar", "/start"]:
         insertMsgr(bot.reply_to(message, "Bienvenido al bot de AFOBA para preparar las fotos para instagram.\n*Responde a cada mensaje* para preparar tu imagen.\nUsa el comando /ayuda si lo necesitas😉", parse_mode= 'Markdown'))
-        insertMsgr(bot.send_message(message.chat.id,"📷Modelo de cámara usado"))#Ejemplo:\nCanon\nEOS 77D
-        insertMsgr(bot.send_message(message.chat.id,"🔢Parametros usados"))#Ejemplo:\nf/1,8 1/900\n35 mm\nISO 160
-        insertMsgr(bot.send_message(message.chat.id,"🗺️Lugar de la foto"))#Ejemplo:\nLa Herradura\n(Granada)
-        insertMsgr(bot.send_message(message.chat.id,"📆Fecha de la foto"))#Ejemplo:\n12 octubre\n2019
-        insertMsgr(bot.send_message(message.chat.id,"🧑‍🚀Autor"))#Ejemplo:\nManolo Ruiz\n(@manruirub)
-        insertMsgr(bot.send_message(message.chat.id,"🏖️Adjunta la foto que quieres preparar"))
+        insertMsgr(bot.send_message(message.chat.id,"Modelo de cámara usado"))#Ejemplo:\nCanon\nEOS 77D
+        insertMsgr(bot.send_message(message.chat.id,"Parametros usados"))#Ejemplo:\nf/1,8 1/900\n35 mm\nISO 160
+        insertMsgr(bot.send_message(message.chat.id,"Lugar de la foto"))#Ejemplo:\nLa Herradura\n(Granada)
+        insertMsgr(bot.send_message(message.chat.id,"Fecha de la foto"))#Ejemplo:\n12 octubre\n2019
+        insertMsgr(bot.send_message(message.chat.id,"Autor"))#Ejemplo:\nManolo Ruiz\n(@manruirub)
+        insertMsgr(bot.send_message(message.chat.id,"Adjunta la foto que quieres preparar"))
     elif message.text in ["/confirmar"]:
         insertMsgr(message)
         deleteMsgrs(message.chat.id)
@@ -183,6 +186,7 @@ def sendMessage(message):
         deleteValues(message.chat.id)
 @bot.message_handler()
 def sendMessage(message):
+    print(message.text)
     insertMsgr(message)
     if message.reply_to_message == None:
         return
@@ -198,6 +202,7 @@ def sendMessage(message):
 
 @bot.message_handler(content_types=['photo'])
 def photo(message):
+    print('Image receive')
     insertMsgr(message)
     fileID = message.photo[-1].file_id
     file_info = bot.get_file(fileID)
